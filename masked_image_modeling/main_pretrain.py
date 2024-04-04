@@ -25,13 +25,6 @@ from engine_pretrain import train_one_epoch
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    # Input
-    parser.add_argument('--img_dim', type=int, default=3,
-                        help='3 for RGB; 1 for Gray.')    
-    parser.add_argument('--patch_size', type=int, default=16,
-                        help='patch_size.')    
-    parser.add_argument('--mask_ratio', type=float, default=0.75,
-                        help='mask ratio.')    
     # Basic
     parser.add_argument('--seed', type=int, default=42,
                         help='random seed.')
@@ -68,6 +61,8 @@ def parse_args():
                         help='keep training')
     parser.add_argument('--drop_path', type=float, default=0.,
                         help='drop_path')
+    parser.add_argument('--mask_ratio', type=float, default=0.75,
+                        help='mask ratio.')    
     # Optimizer
     parser.add_argument('-opt', '--optimizer', type=str, default='adamw',
                         help='sgd, adam')

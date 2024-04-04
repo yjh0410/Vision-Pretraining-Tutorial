@@ -7,17 +7,20 @@ from .custom import CustomDataset
 
 def build_dataset(args, is_train=False):
     if args.dataset == 'cifar10':
+        args.img_dim     = 3
+        args.img_size    = 32
+        args.mlp_in_dim  = 32 * 32 * 3
         args.num_classes = 10
-        args.img_dim = 3
-        args.mlp_in_dim = 32 * 32 * 3
         return CifarDataset(is_train)
     elif args.dataset == 'mnist':
+        args.img_dim     = 1
+        args.img_size    = 28
+        args.mlp_in_dim  = 28 * 28 * 1
         args.num_classes = 10
-        args.img_dim = 1
-        args.mlp_in_dim = 28 * 28
         return MnistDataset(is_train)
     elif args.dataset == 'custom':
         assert args.num_classes is not None and isinstance(args.num_classes, int)
+        args.img_size = 224
         args.mlp_in_dim = 224 * 224 * 3
         return CustomDataset(args, is_train)
     

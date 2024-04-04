@@ -10,12 +10,14 @@ def build_dataset(args, is_train=False):
         args.num_classes = 10
         args.img_dim = 3
         args.img_size = 32
+        args.patch_size = 2
         return CifarDataset(is_train)
         
     # ----------------- Customed dataset -----------------
     elif args.dataset == 'custom':
         assert args.num_classes is not None and isinstance(args.num_classes, int)
         args.img_size = 224
+        args.patch_size = 16
         return CustomDataset(args, is_train)
     
     else:
