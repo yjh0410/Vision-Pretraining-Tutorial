@@ -41,8 +41,8 @@ class SLP(nn.Module):
         super().__init__()
         use_bias = False if norm_type is not None else True
         self.layer = nn.Linear(in_features=in_dim, out_features=out_dim, bias=use_bias)
-        self.act   = get_activation(act_type)
         self.norm  = get_norm(norm_type, out_dim)
+        self.act   = get_activation(act_type)
 
     def forward(self, x):
-        return self.norm(self.act(self.layer(x)))
+        return self.act(self.norm(self.layer(x)))

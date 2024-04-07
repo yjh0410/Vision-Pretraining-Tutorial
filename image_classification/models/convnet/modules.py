@@ -61,8 +61,8 @@ class ConvModule(nn.Module):
         self.layer = nn.Conv2d(in_channels=in_dim, out_channels=out_dim,
                                kernel_size=kernel_size, padding=padding, stride=stride,
                                bias=use_bias)
-        self.act   = get_activation(act_type)
         self.norm  = get_norm(norm_type, out_dim)
+        self.act   = get_activation(act_type)
 
     def forward(self, x):
-        return self.norm(self.act(self.layer(x)))
+        return self.act(self.norm(self.layer(x)))

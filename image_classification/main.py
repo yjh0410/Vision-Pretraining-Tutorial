@@ -119,6 +119,9 @@ def main():
     model.train().to(device)
     print(model)
 
+    # ------------------------- Build Criterion -------------------------
+    criterion = torch.nn.CrossEntropyLoss()
+
     # ------------------------- Build Optimzier -------------------------
     optimizer = build_optimizer(args, model)
 
@@ -127,7 +130,6 @@ def main():
     lr_scheduler = build_lr_scheduler(args, optimizer)
 
     # ------------------------- Build Criterion -------------------------
-    criterion = torch.nn.CrossEntropyLoss()
     load_model(args, model, optimizer, lr_scheduler)
 
     # ------------------------- Eval before Train Pipeline -------------------------
