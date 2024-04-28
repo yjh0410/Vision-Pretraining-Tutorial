@@ -51,18 +51,36 @@ class ConvModule(nn.Module):
     def __init__(self,
                  in_dim      :int,
                  out_dim     :int,
-                 kernel_size :int = 1,
-                 padding     :int = 0,
-                 stride      :int = 1,
-                 act_type    :str = "relu",
-                 norm_type   :str = "bn") -> None:
+                 kernel_size :int  = 1,
+                 padding     :int  = 0,
+                 stride      :int  = 1,
+                 act_type    :str  = "relu",
+                 norm_type   :str  = "bn",
+                 depthwise   :bool = False) -> None:
         super().__init__()
         use_bias = False if norm_type is not None else True
-        self.layer = nn.Conv2d(in_channels=in_dim, out_channels=out_dim,
-                               kernel_size=kernel_size, padding=padding, stride=stride,
-                               bias=use_bias)
-        self.norm  = get_norm(norm_type, out_dim)
+        self.depthwise = depthwise
+        if not depthwise:
+            self.conv = nn.Conv2d(in_channels=in_dim, out_channels=out_dim,
+                                kernel_size=kernel_size, padding=padding, stride=stride,
+                                bias=use_bias)
+            self.norm  = get_norm(norm_type, out_dim)
+        else:
+            self.conv1 = nn.Conv2d(in_channels=in_dim, out_channels=in_dim,
+                                   kernel_size=kernel_size, padding=padding, stride=stride, groups=in_dim,
+                                   bias=use_bias)
+            self.norm1 = get_norm(norm_type, in_dim)
+            self.conv2 = nn.Conv2d(in_channels=in_dim, out_channels=out_dim,
+                                   kernel_size=1, padding=0, stride=1,
+                                   bias=use_bias)
+            self.norm2 = get_norm(norm_type, out_dim)
         self.act   = get_activation(act_type)
 
     def forward(self, x):
-        return self.act(self.norm(self.layer(x)))
+        if self.depthwise:
+            x = self.norm1(self.conv1(x))
+            x = self.act(self.norm2(self.conv2(x)))
+        else:
+            x = self.act(self.norm(self.conv(x)))
+
+        return x
