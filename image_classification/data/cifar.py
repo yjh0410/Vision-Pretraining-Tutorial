@@ -10,8 +10,8 @@ class CifarDataset(data.Dataset):
         super().__init__()
         # ----------------- basic parameters -----------------
         self.is_train   = is_train
-        self.pixel_mean = [0.5, 0.5, 0.5]
-        self.pixel_std  = [0.5, 0.5, 0.5]
+        self.pixel_mean = [0.0]
+        self.pixel_std  = [1.0]
         self.image_set  = 'train' if is_train else 'val'
         # ----------------- dataset & transforms -----------------
         self.transform = self.build_transform()
@@ -33,9 +33,12 @@ class CifarDataset(data.Dataset):
         # laod data
         image, target = self.dataset[index]
 
-        # denormalize image
+        # ------- Denormalize image -------
+        ## [C, H, W] -> [H, W, C], torch.Tensor -> numpy.adnarry
         image = image.permute(1, 2, 0).numpy()
+        ## Denomalize: I = I_n * std + mean, I = I * 255
         image = (image * self.pixel_std + self.pixel_mean) * 255.
+
         image = image.astype(np.uint8)
         image = image.copy()
 
@@ -43,17 +46,26 @@ class CifarDataset(data.Dataset):
 
     def build_transform(self):
         if self.is_train:
-            transforms = T.Compose([T.ToTensor(), T.Normalize(0.5, 0.5)])
+            transforms = T.Compose([T.ToTensor(), T.RandomCrop(size=32, padding=8)])
         else:
-            transforms = T.Compose([T.ToTensor(), T.Normalize(0.5, 0.5)])
+            transforms = T.Compose([T.ToTensor()])
 
         return transforms
 
 if __name__ == "__main__":
     import cv2
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Cifar-Dataset')
+
+    # opt
+    parser.add_argument('--is_train', action="store_true", default=False,
+                        help='train or not.')
+    
+    args = parser.parse_args()
 
     # dataset
-    dataset = CifarDataset(is_train=True)  
+    dataset = CifarDataset(is_train=args.is_train)  
     print('Dataset size: ', len(dataset))
 
     for i in range(1000):
@@ -63,4 +75,3 @@ if __name__ == "__main__":
 
         cv2.imshow('image', image)
         cv2.waitKey(0)
-

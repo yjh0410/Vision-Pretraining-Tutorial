@@ -64,17 +64,19 @@ class ConvNet(nn.Module):
         )
 
         if use_adavgpool:
-            self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+            self.avgpool = nn.AdaptiveAvgPool2d(output_size=(1, 1))
             self.fc      = nn.Linear(hidden_dim * 4, num_classes)
         else:
             self.avgpool = None
-            fc_in_dim    = (img_size // 8) ** 2 * (hidden_dim * 4)  # N = Co x Ho x W*
+            fc_in_dim    = (img_size // 8) ** 2 * (hidden_dim * 4)  # N = Co x Ho x W
             self.fc      = nn.Linear(fc_in_dim , num_classes)
 
     def forward(self, x):
         """
         Input:
             x : (torch.Tensor) -> [B, C, H, W]
+        Output:
+            x : (torch.Tensor) -> [B, Nc], Nc is the number of the object categories.
         """
         # [B, C_in, H, W]   -> [B, C1, H/2, W/2]
         x = self.layer_1(x)
@@ -96,7 +98,7 @@ class ConvNet(nn.Module):
 
 
 if __name__ == "__main__":
-    bs, img_dim, img_size = 8, 3, 32
+    bs, img_dim, img_size = 8, 3, 28
     hidden_dim  = 16
     num_classes = 10
     
@@ -111,7 +113,7 @@ if __name__ == "__main__":
                     act_type      = 'relu',
                     norm_type     = 'bn',
                     depthwise     = False,
-                    use_adavgpool = True)
+                    use_adavgpool = False)
 
     # Inference
     output = model(x)

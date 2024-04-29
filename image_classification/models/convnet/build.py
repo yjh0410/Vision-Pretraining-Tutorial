@@ -4,9 +4,9 @@ def build_convnet(args):
     if args.model == "convnet":
         model = ConvNet(img_size      = args.img_size,
                         in_dim        = args.img_dim,
-                        hidden_dim    = 16,
+                        hidden_dim    = 64,
                         num_classes   = args.num_classes,
-                        act_type      = "sigmoid",
+                        act_type      = "relu",
                         norm_type     = "bn",
                         use_adavgpool = True)
         

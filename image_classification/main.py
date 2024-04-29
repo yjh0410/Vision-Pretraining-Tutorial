@@ -163,7 +163,7 @@ def main():
 
             # Save model
             print('- saving the model after {} epochs ...'.format(epoch))
-            save_model(args, epoch, model, optimizer, lr_scheduler, max_accuracy)
+            save_model(args, epoch, model, optimizer, lr_scheduler, test_stats["acc1"])
 
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
