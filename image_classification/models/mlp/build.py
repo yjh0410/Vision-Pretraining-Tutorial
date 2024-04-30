@@ -5,7 +5,7 @@ def build_mlp(args):
         model = MLP(in_dim     = args.mlp_in_dim,
                     inter_dim  = 1024,
                     out_dim    = args.num_classes,
-                    act_type   = "sigmoid",
+                    act_type   = "relu",
                     norm_type  = "bn")
         
     else:

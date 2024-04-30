@@ -1,7 +1,6 @@
-from copy import deepcopy
 import os
 import time
-import math
+import matplotlib.pyplot as plt
 import argparse
 import datetime
 
@@ -144,14 +143,19 @@ def main():
     start_time = time.time()
     max_accuracy = -1.0
     print("=============== Start training for {} epochs ===============".format(args.max_epoch))
+    train_loss_logs = []
+    valid_loss_logs = []
+    valid_acc1_logs = []
     for epoch in range(args.start_epoch, args.max_epoch):
         # train one epoch
-        train_one_epoch(args, device, model, train_dataloader, optimizer,
-                        epoch, lr_scheduler_warmup, criterion)
+        train_stats = train_one_epoch(args, device, model, train_dataloader, optimizer,
+                                      epoch, lr_scheduler_warmup, criterion)
 
         # LR scheduler
         if (epoch + 1) > args.wp_epoch:
             lr_scheduler.step()
+
+        train_loss_logs.append((epoch, train_stats["loss"]))
 
         # Evaluate
         if (epoch % args.eval_epoch) == 0 or (epoch + 1 == args.max_epoch):
@@ -165,9 +169,35 @@ def main():
             print('- saving the model after {} epochs ...'.format(epoch))
             save_model(args, epoch, model, optimizer, lr_scheduler, test_stats["acc1"])
 
+            valid_acc1_logs.append((epoch, test_stats["acc1"]))
+            valid_loss_logs.append((epoch, test_stats["loss"]))
+
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
     print('Training time {}'.format(total_time_str))
+
+    # --------------- Plot log curve ---------------
+    ## Training loss
+    epochs = [sample[0] for sample in train_loss_logs]
+    tloss  = [sample[1] for sample in train_loss_logs]
+    plt.plot(epochs, tloss, c='r', label='training loss')
+    plt.xlabel('epoch')
+    plt.ylabel('loss')
+    plt.title('Training & Validation loss curve')
+    ## Valid loss
+    epochs = [sample[0] for sample in valid_loss_logs]
+    vloss  = [sample[1] for sample in valid_loss_logs]
+    plt.plot(epochs, vloss, c='b', label='validation loss')
+    plt.show()
+    ## Valid acc1
+    epochs = [sample[0] for sample in valid_acc1_logs]
+    acc1   = [sample[1] for sample in valid_acc1_logs]
+    plt.plot(epochs, acc1, label='validation loss')
+    plt.xlabel('epoch')
+    plt.ylabel('top1 accuracy')
+    plt.title('Validation top-1 accuracy curve')
+    plt.show()
+
 
 
 if __name__ == "__main__":
