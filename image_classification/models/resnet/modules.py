@@ -93,7 +93,7 @@ class PlainResBlock(nn.Module):
         self.out_dim = out_dim
         self.inter_dim = inter_dim
         self.stride = stride
-        self.downsample = stride > 1
+        self.downsample = stride > 1 or in_dim != out_dim
 
         # -------- Model parameters --------
         self.conv_layer_1 = ConvModule(in_dim, inter_dim,
@@ -104,19 +104,18 @@ class PlainResBlock(nn.Module):
                                        act_type=None, norm_type='bn', depthwise=False)
         self.out_act = nn.ReLU(inplace=True)
 
-        if self.downsample or in_dim != out_dim:
-            self.ds_layer = ConvModule(in_dim, out_dim,
+        if self.downsample:
+            self.res_layer = ConvModule(in_dim, out_dim,
                                        kernel_size=1, padding=0, stride=stride,
                                        act_type=None, norm_type='bn', depthwise=False)
         else:
-            self.ds_layer = None
+            self.res_layer = nn.Identity()
 
     def forward(self, x):
         out = self.conv_layer_1(x)
         out = self.conv_layer_2(out)
 
-        if self.downsample:
-            x = self.ds_layer(x)
+        x = self.res_layer(x)
 
         out = x + out
         out = self.out_act(out)
@@ -130,7 +129,7 @@ class BottleneckResBlock(nn.Module):
         self.in_dim = in_dim
         self.out_dim = out_dim
         self.stride = stride
-        self.downsample = stride > 1
+        self.downsample = stride > 1 or in_dim != out_dim
 
         # -------- Model parameters --------
         self.conv_layer_1 = ConvModule(in_dim, inter_dim,
@@ -144,20 +143,19 @@ class BottleneckResBlock(nn.Module):
                                        act_type=None, norm_type='bn', depthwise=False)
         self.out_act = nn.ReLU(inplace=True)
 
-        if self.downsample or in_dim != out_dim:
-            self.ds_layer = ConvModule(in_dim, out_dim,
+        if self.downsample:
+            self.res_layer = ConvModule(in_dim, out_dim,
                                        kernel_size=1, padding=0, stride=stride,
                                        act_type=None, norm_type='bn', depthwise=False)
         else:
-            self.ds_layer = None
+            self.res_layer = nn.Identity()
 
     def forward(self, x):
         out = self.conv_layer_1(x)
         out = self.conv_layer_2(out)
         out = self.conv_layer_3(out)
 
-        if self.ds_layer is not None:
-            x = self.ds_layer(x)
+        x = self.res_layer(x)
 
         out = x + out
         out = self.out_act(out)

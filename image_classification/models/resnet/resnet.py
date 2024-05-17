@@ -91,27 +91,20 @@ def build_resnet(model_name='resnet18', img_dim=3):
     return model
 
 
-
-
 if __name__=='__main__':
     import time
-    from thop import profile
 
-    # Build backbone
-    model = build_resnet(model_name='resnet50')
+    # 构建ResNet模型
+    model = build_resnet(model_name='resnet18')
+
+    # 打印模型结构
     print(model)
 
-    # Inference
+    # 随即成生数据
     x = torch.randn(1, 3, 224, 224)
+
+    # 模型前向推理
     t0 = time.time()
     output = model(x)
     t1 = time.time()
     print('Time: ', t1 - t0)
-    print(output.shape)
-    print(model)
-
-    print('==============================')
-    flops, params = profile(model, inputs=(x, ), verbose=False)
-    print('==============================')
-    print('GFLOPs : {:.2f}'.format(flops / 1e9 * 2))
-    print('Params : {:.2f} M'.format(params / 1e6))
