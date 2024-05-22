@@ -46,7 +46,7 @@ class CifarDataset(data.Dataset):
 
     def build_transform(self):
         if self.is_train:
-            transforms = T.Compose([T.ToTensor(), T.RandomCrop(size=32, padding=8)])
+            transforms = T.Compose([T.ToTensor(), T.RandomCrop(size=32, padding=4)])
         else:
             transforms = T.Compose([T.ToTensor()])
 

@@ -22,16 +22,17 @@ class LinearWarmUpLrScheduler(object):
 
 
 def build_lr_scheduler(args, optimizer):
+    print("=================== LR Scheduler information ===================")
+    print("LR Scheduler: ", args.lr_scheduler)
+
     if args.lr_scheduler == "step":
-        lr_step = [args.max_epoch // 3, args.max_epoch // 3 * 2]
+        lr_step = [args.max_epoch // 2, args.max_epoch // 4 * 3]
         scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=lr_step, gamma=0.1)
+        print("lr step: ", lr_step)
     elif args.lr_scheduler == "cosine":
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.max_epoch - args.wp_epoch - 1, eta_min=args.min_lr)
     else:
         raise NotImplementedError("Unknown lr scheduler: {}".format(args.lr_scheduler))
     
-    print("=================== LR Scheduler information ===================")
-    print("LR Scheduler: ", args.lr_scheduler)
-
     return scheduler
         
