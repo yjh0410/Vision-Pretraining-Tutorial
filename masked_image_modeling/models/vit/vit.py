@@ -41,7 +41,7 @@ class ImageEncoderViT(nn.Module):
         self.pos_embed   = nn.Parameter(torch.zeros(1, self.num_patches, patch_embed_dim))
         self.norm_layer  = nn.LayerNorm(patch_embed_dim)
         self.blocks      = nn.ModuleList([
-            ViTBlock(patch_embed_dim, num_heads, mlp_ratio, True, act_layer=act_layer, dropout=dropout)
+            ViTBlock(patch_embed_dim, num_heads, mlp_ratio, True, act_layer, dropout)
             for _ in range(depth)])
 
         self._init_weights()
@@ -61,10 +61,6 @@ class ImageEncoderViT(nn.Module):
             elif isinstance(m, nn.LayerNorm):
                 nn.init.constant_(m.bias, 0)
                 nn.init.constant_(m.weight, 1.0)
-
-    @torch.jit.ignore
-    def no_weight_decay(self):
-        return {'pos_embed', 'cls_token', 'dist_token'}
 
     def get_posembed(self, embed_dim, grid_size, temperature=10000):
         scale = 2 * torch.pi

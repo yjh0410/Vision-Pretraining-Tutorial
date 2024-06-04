@@ -10,7 +10,7 @@ def build_dataset(args, is_train=False):
         args.num_classes = 10
         args.img_dim = 3
         args.img_size = 32
-        args.patch_size = 2
+        args.patch_size = 4
         return CifarDataset(is_train)
         
     # ----------------- Customed dataset -----------------
