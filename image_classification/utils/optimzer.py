@@ -7,7 +7,7 @@ def build_optimizer(args, model):
     
     ## learning rate
     if args.optimizer == "adamw":
-        batch_base = 256 if "vit" in args.model else 1024
+        batch_base = 256 if "vit" in args.model or "resnet" in args.model else 1024
         args.base_lr = args.base_lr / batch_base * args.batch_size
         optimizer = torch.optim.AdamW(model.parameters(),
                                       lr=args.base_lr,
@@ -17,7 +17,7 @@ def build_optimizer(args, model):
         print('- weight_decay: ', args.weight_decay)
     elif args.optimizer == "sgd":
         batch_base = 128
-        args.base_lr = args.base_lr / 128 * args.batch_size
+        args.base_lr = args.base_lr / batch_base * args.batch_size
         optimizer = torch.optim.SGD(model.parameters(),
                                     lr=args.base_lr,
                                     momentum=0.9,
