@@ -122,3 +122,27 @@ class Attention(nn.Module):
 attn_layer = Attention(embed_dim, num_heads=8)
 attn_out = attn_layer(seq)
 print("注意力曾的输出的shape：", attn_out.shape)
+
+
+# ------------ 定义 前馈传播网络（FFN）------------
+class FeedFroward(nn.Module):
+    def __init__(self,
+                 embedding_dim: int,
+                 mlp_dim: int,
+                 act: nn.GELU,
+                 dropout: float = 0.0,
+                 ) -> None:
+        super().__init__()
+        self.fc1   = nn.Linear(embedding_dim, mlp_dim)
+        self.drop1 = nn.Dropout(dropout)
+        self.fc2   = nn.Linear(mlp_dim, embedding_dim)
+        self.drop2 = nn.Dropout(dropout)
+        self.act   = act()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.fc1(x)
+        x = self.act(x)
+        x = self.drop1(x)
+        x = self.fc2(x)
+        x = self.drop2(x)
+        return x

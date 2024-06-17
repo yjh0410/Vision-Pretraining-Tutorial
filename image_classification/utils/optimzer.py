@@ -7,7 +7,7 @@ def build_optimizer(args, model):
     
     ## learning rate
     if args.optimizer == "adamw":
-        batch_base = 256 if "vit" in args.model or "resnet" in args.model else 1024
+        batch_base = 256 if "vit" in args.model else 1024
         args.base_lr = args.base_lr / batch_base * args.batch_size
         optimizer = torch.optim.AdamW(model.parameters(),
                                       lr=args.base_lr,

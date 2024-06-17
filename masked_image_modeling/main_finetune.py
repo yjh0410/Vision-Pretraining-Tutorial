@@ -89,7 +89,7 @@ def main():
     setup_seed(args.seed)
 
     # Path to save model
-    path_to_save = os.path.join(args.path_to_save, args.dataset, args.model)
+    path_to_save = os.path.join(args.path_to_save, args.dataset, "finetune", args.model)
     os.makedirs(path_to_save, exist_ok=True)
     args.output_dir = path_to_save
 
