@@ -131,6 +131,9 @@ class Attention(nn.Module):
 
 # ----------------------- Classifier -----------------------
 class AttentionPoolingClassifier(nn.Module):
+    """
+    This code is referenced to https://github.com/apple/ml-aim/blob/main/aim/torch/layers.py
+    """
     def __init__(
         self,
         in_dim      : int,
@@ -155,32 +158,34 @@ class AttentionPoolingClassifier(nn.Module):
 
     def forward(self, x: torch.Tensor):
         B, N, C = x.shape
-
+        # Prenorm
         x = self.bn(x.transpose(-2, -1)).transpose(-2, -1)
-        cls_token = self.cls_token.expand(B, -1, -1)  # newly created class token
 
+        # [C] -> [B, 1, C]
+        cls_token = self.cls_token.expand(B, -1, -1)
+
+        # [B, 1, C] -> [B, 1, H, C_h] -> [B, H, 1, C_h]
         q = cls_token.reshape(
             B, self.num_queries, self.num_heads, C // self.num_heads
         ).permute(0, 2, 1, 3)
-        k = (
-            self.k(x)
-            .reshape(B, N, self.num_heads, C // self.num_heads)
-            .permute(0, 2, 1, 3)
-        )
 
+        # [B, N, C] -> [B, N, H, C_h] -> [B, H, N, C_h]
+        k = self.k(x).reshape(
+            B, N, self.num_heads, C // self.num_heads
+            ).permute(0, 2, 1, 3)
+        v = self.v(x).reshape(
+            B, N, self.num_heads, C // self.num_heads
+            ).permute(0, 2, 1, 3)
+
+        # Attention
         q = q * self.scale
-        v = (
-            self.v(x)
-            .reshape(B, N, self.num_heads, C // self.num_heads)
-            .permute(0, 2, 1, 3)
-        )
-
         attn = q @ k.transpose(-2, -1)
         attn = attn.softmax(dim=-1)
 
         x_cls = (attn @ v).transpose(1, 2).reshape(B, self.num_queries, C)
         x_cls = x_cls.mean(dim=1)
 
+        # Classify
         out = self.linear(x_cls)
 
         return out, x_cls
