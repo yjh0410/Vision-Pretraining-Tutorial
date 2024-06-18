@@ -8,10 +8,15 @@ cd Vision-Pretraining-Tutorial/masked_image_modeling/
 python main_pretrain.py --cuda \
                         --dataset cifar10 \
                         --model vit_t \
+                        --mask_ratio 0.75 \
                         --batch_size 256 \
                         --optimizer adamw \
-                        --base_lr 1e-3 \
-                        --min_lr 1e-6
+                        --weight_decay 0.05 \
+                        --lr_scheduler cosine \
+                        --base_lr 0.00015 \
+                        --min_lr 0.0 \
+                        --max_epoch 400 \
+                        --eval_epoch 20
 ```
 
 ## 2. Finetune
@@ -24,30 +29,35 @@ python main_finetune.py --cuda \
                         --model vit_t \
                         --batch_size 256 \
                         --optimizer adamw \
-                        --base_lr 1e-3 \
-                        --min_lr 1e-6
+                        --weight_decay 0.05 \
+                        --base_lr 0.0005 \
+                        --min_lr 0.000001 \
+                        --max_epoch 100 \
+                        --wp_epoch 5 \
+                        --eval_epoch 5 \
+                        --pretrained path/to/mae_vit_t.pth
 ```
 ## 3. Evaluate 
 - Evaluate the `top1 & top5` accuracy of `ViT-Tiny` on CIFAR10 dataset:
 ```Shell
-python train_finetune.py --dataset cifar10 -m vit_tiny --batch_size 256 --img_size 32 --patch_size 2 --eval --resume path/to/vit_tiny_cifar10.pth
+python train_finetune.py --dataset cifar10 -m vit_tiny --batch_size 256 --eval --resume path/to/vit_tiny_cifar10.pth
 ```
 
 - Evaluate the `top1 & top5` accuracy of `ViT-Tiny` on ImageNet-1K dataset:
 ```Shell
-python train_finetune.py --dataset cifar10 -m vit_tiny --batch_size 256 --img_size 224 --patch_size 16 --eval --resume path/to/vit_tiny_cifar10.pth
+python train_finetune.py --dataset cifar10 -m vit_tiny --batch_size 256 --eval --resume path/to/vit_tiny_cifar10.pth
 ```
 
 
 ## 4. Visualize Image Reconstruction
 - Evaluate `MAE-ViT-Tiny` on CIFAR10 dataset:
 ```Shell
-python train_pretrain.py --dataset cifar10 -m mae_vit_tiny --resume path/to/mae_vit_tiny_cifar10.pth --img_size 32 --patch_size 2 --eval --batch_size 1
+python train_pretrain.py --dataset cifar10 -m mae_vit_tiny --resume path/to/mae_vit_tiny_cifar10.pth --eval --batch_size 1
 ```
 
 - Evaluate `MAE-ViT-Tiny` on ImageNet-1K dataset:
 ```Shell
-python train_pretrain.py --dataset cifar10 -m mae_vit_tiny --resume path/to/mae_vit_tiny_cifar10.pth --img_size 224 --patch_size 16 --eval --batch_size 1
+python train_pretrain.py --dataset cifar10 -m mae_vit_tiny --resume path/to/mae_vit_tiny_cifar10.pth --eval --batch_size 1
 ```
 
 
