@@ -180,17 +180,20 @@ def visualize(args, device, model):
             org_img = (org_img * pixel_std + pixel_mean) * 255.
             org_img = org_img.astype(np.uint8)
 
-            # Masked image
+            # 调整mask的格式：[B, H*W] -> [B, H*W, p*p*3]
             mask = output['mask'].unsqueeze(-1).repeat(1, 1, patch_size**2 *3)  # [B, H*W] -> [B, H*W, p*p*3]
+            # 将序列格式的mask逆转回二维图像格式
             mask = unpatchify(mask, patch_size)
             mask = mask[0].permute(1, 2, 0).cpu().numpy()
+            # 掩盖图像中被遮掩的图像patch区域
             masked_img = org_img * (1 - mask)  # 1 is removing, 0 is keeping
             masked_img = masked_img.astype(np.uint8)
 
-            # Denormalize reconstructed image
+            # 将序列格式的重构图像逆转回二维图像格式
             pred_img = unpatchify(output['x_pred'], patch_size)
             pred_img = pred_img[0].permute(1, 2, 0).cpu().numpy()
             pred_img = (pred_img * pixel_std + pixel_mean) * 255.
+            # 将原图中被保留的图像patch和网络预测的重构的图像patch拼在一起
             pred_img = org_img * (1 - mask) + pred_img * mask
             pred_img = pred_img.astype(np.uint8)
 

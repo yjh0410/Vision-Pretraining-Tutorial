@@ -1,7 +1,7 @@
 # Masked AutoEncoder
 
 ## 1. Pretrain
-We have kindly provided the bash script `train_pretrain.sh` file for pretraining. You can modify some hyperparameters in the script file according to your own needs.
+We have kindly provided the bash script `main_pretrain.sh` file for pretraining. You can modify some hyperparameters in the script file according to your own needs.
 
 ```Shell
 cd Vision-Pretraining-Tutorial/masked_image_modeling/
@@ -9,7 +9,7 @@ python main_pretrain.py --cuda \
                         --dataset cifar10 \
                         --model vit_t \
                         --mask_ratio 0.75 \
-                        --batch_size 256 \
+                        --batch_size 128 \
                         --optimizer adamw \
                         --weight_decay 0.05 \
                         --lr_scheduler cosine \
@@ -20,7 +20,7 @@ python main_pretrain.py --cuda \
 ```
 
 ## 2. Finetune
-We have kindly provided the bash script `train_finetune.sh` file for finetuning. You can modify some hyperparameters in the script file according to your own needs.
+We have kindly provided the bash script `main_finetune.sh` file for finetuning. You can modify some hyperparameters in the script file according to your own needs.
 
 ```Shell
 cd Vision-Pretraining-Tutorial/masked_image_modeling/
@@ -35,29 +35,29 @@ python main_finetune.py --cuda \
                         --max_epoch 100 \
                         --wp_epoch 5 \
                         --eval_epoch 5 \
-                        --pretrained path/to/mae_vit_t.pth
+                        --pretrained path/to/vit_t.pth
 ```
 ## 3. Evaluate 
 - Evaluate the `top1 & top5` accuracy of `ViT-Tiny` on CIFAR10 dataset:
 ```Shell
-python train_finetune.py --dataset cifar10 -m vit_tiny --batch_size 256 --eval --resume path/to/vit_tiny_cifar10.pth
-```
-
-- Evaluate the `top1 & top5` accuracy of `ViT-Tiny` on ImageNet-1K dataset:
-```Shell
-python train_finetune.py --dataset cifar10 -m vit_tiny --batch_size 256 --eval --resume path/to/vit_tiny_cifar10.pth
+python main_finetune.py --cuda \
+                        --dataset cifar10 \
+                        -m vit_t \
+                        --batch_size 256 \
+                        --eval \
+                        --resume path/to/vit_t_cifar10.pth
 ```
 
 
 ## 4. Visualize Image Reconstruction
-- Evaluate `MAE-ViT-Tiny` on CIFAR10 dataset:
+- Evaluate `ViT-Tiny` pretrained by MAE framework on CIFAR10 dataset:
 ```Shell
-python train_pretrain.py --dataset cifar10 -m mae_vit_tiny --resume path/to/mae_vit_tiny_cifar10.pth --eval --batch_size 1
-```
-
-- Evaluate `MAE-ViT-Tiny` on ImageNet-1K dataset:
-```Shell
-python train_pretrain.py --dataset cifar10 -m mae_vit_tiny --resume path/to/mae_vit_tiny_cifar10.pth --eval --batch_size 1
+python main_pretrain.py --cuda \
+                        --dataset cifar10 \
+                        -m vit_t \
+                        --resume path/to/mae_vit_t_cifar10.pth \
+                        --eval \
+                        --batch_size 1
 ```
 
 
